@@ -50,15 +50,18 @@ def MLP(alpha, lr, layer1, layer2, layer3):
 
     return X, label, train_step, accuracy
 ### ### ###
+
+
 def session_manager(MLP):
-    def session_manager_function(alpha, lr, layer1, layer2, layer3):
-        X, label, train_step, accuracy = MLP(alpha, lr, layer1, layer2, layer3)
+    #def session_manager_function(alpha, lr, layer1, layer2, layer3):
+    def session_manager_function(**hyper_parameter_dict):
+        #X, label, train_step, accuracy = MLP(alpha, lr, layer1, layer2, layer3)
+        X, label, train_step, accuracy = MLP(**hyper_parameter_dict)
         init = tf.initialize_all_variables()
         with tf.Session() as sess:
             sess.run(init)
             print("Training...")
             for i in range(20000):
-                #batch_x, batch_y = X_train[(50*i):(50*(i+1)),:], y_train[(50*i):(50*(i+1)),0]
                 batch_index = np.random.choice(X_train.shape[0], 50, replace=False)
                 batch_x = X_train[batch_index, :]
                 batch_y = y_train[batch_index, 0]
@@ -72,7 +75,7 @@ def session_manager(MLP):
             return accuracy
     return session_manager_function
 
-def main(k_num, acq, verbose=True):
+def BO_function(k_num, acq, verbose=True):
     gp_params = {"alpha": 1e-5}
 
     MPL_Session = session_manager(MLP)
@@ -98,7 +101,7 @@ def main(k_num, acq, verbose=True):
     print("-"*53)
 
 if __name__ == "__main__":
-    main(0, "ucb")
+    BO_function(0, "ucb")
     # kernel function
     #   0: Matern(nu=0.5)
     #   1: Matern(nu=1.5)
